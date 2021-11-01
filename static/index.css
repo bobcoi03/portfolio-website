@@ -1,0 +1,35 @@
+#chat-box {
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+    width: 80%;
+    height: 800px;
+    margin: auto;
+    background-color:white;
+    border-width:3px;
+    border-color: black;
+    border-style: solid;
+}
+
+.chatBoxDiv {
+    margin: 0 auto;
+    width: 100%;
+    height: 40px;
+    background-color:white;
+    position: absolute;
+    bottom: 0;
+    border-color: #6c757d;
+}
+
+#menuBar{
+    margin-top: 12px;
+    margin-left: 5px;
+    height: 20px;
+    width: 20px;
+}
+
+@media only screen and (max-width: 768px) {
+    #chat-box {
+        height: 450px;
+    }
+}
