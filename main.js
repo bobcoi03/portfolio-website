@@ -30,8 +30,8 @@ io.on("connection", (socket) => {
         console.log('user disconnected')
     })
     // send = socket.emit('x') & receive = socket.on('x')
-    socket.on('chat message', (msg) => {
-        io.emit('chat message', msg)
+    socket.on('chat message', (msg, minutes, hours) => {
+        io.emit('chat message', msg, minutes, hours);
     })
 });
 
