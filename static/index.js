@@ -47,9 +47,9 @@ socket.on('chat message', function(msg, stringTimeObj) {
     item.textContent = msg;
     item.id = messageIdNumber;
     messageIdNumber += 1;
+
     messages.appendChild(item);
-    document.getElementById(String(messageIdNumber - 1)).appendChild(displayDate);
-    
+    messages.appendChild(displayDate);
     messages.appendChild(document.createElement('br'));
 
     window.scrollTo(0, document.body.scrollHeight);
