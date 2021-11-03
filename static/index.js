@@ -4,7 +4,6 @@ var messages = document.getElementById('messages');
 var form = document.getElementById('sendButtonForm');
 var input = document.getElementById('chatBox');
 var chatBox = document.getElementById("chat-box");
-
 var goRound = 0;
 var messageIdNumber = 1;
 
@@ -19,10 +18,18 @@ form.addEventListener('submit', function(e) {
     }
 });
 
+function getHeightOfPreviousMessage(messageId) {
+    // returns height for gapBetweenMessageBoxes
+    var heightOfGapBox = 0;
+    var previousMsg = document.getElementById(messageIdNumber -1);
+    heightOfGapBox = previousMsg.style.height;
+
+    return heightOfGapBox; 
+}
+
 socket.on('chat message', function(msg, minutes, hours) {
     var item = document.createElement('div');
-    var gapBetweenMessageBoxes = document.createElement('div')
-    gapBetweenMessageBoxes.className = 'gapBetweenMessageBoxes';
+    var gapBetweenMessageBoxes = document.createElement('div');
     if (goRound % 2 == 0) {
         item.className = 'messageBoxRight';
     } else {
@@ -30,9 +37,9 @@ socket.on('chat message', function(msg, minutes, hours) {
     }
     goRound += 1;
     item.textContent = msg;
+    item.id = messageIdNumber;
+    messageIdNumber += 1;
     messages.appendChild(item);
-    messages.appendChild(gapBetweenMessageBoxes);
-
     window.scrollTo(0, document.body.scrollHeight);
 });
 

@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column-reverse;
     width: 80%;
-    height:90vh;
+    height: 80vh;
     margin: auto;
     background-color:white;
     border-width:1px;
@@ -24,29 +24,32 @@
 #chatBox {
     height: 5vh;
 }
+
 #button-addon2{
     height: 5vh;
 }
 
 .messageBoxRight {
+    display: flex;
     margin-right: 2vw;
     margin-bottom: 0.3vh;
     max-width: 30%;
     border-radius: 1vw;
     background-color: #5c95e9;
-    padding: 1vw;
+    padding: 0.5vw;
     float:  right;
     clear: right;
     word-wrap: break-word;
 }
 
 .messageBoxLeft {
+    display: flex;
     margin-left: 2vw;
     margin-bottom: 0.3vh;
     max-width: 30%;
     border-radius: 1vw;
     background-color: #5c95e9;
-    padding: 1vw;
+    padding: 0.5vw;
     float:  left;
     clear: left;
     word-wrap: break-word;
@@ -60,11 +63,4 @@
 }
 
 .gapBetweenMessageBoxes {
-    height: 10vh;
-}
-
-@media only screen and (max-width: 768px) {
-    #chat-box {
-        height: 450px;
-    }
 }
