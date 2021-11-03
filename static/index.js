@@ -30,12 +30,17 @@ function getHeightOfPreviousMessage(messageId) {
 socket.on('chat message', function(msg, minutes, hours) {
     var item = document.createElement('div');
     var gapBetweenMessageBoxes = document.createElement('div');
+    item.className = 'messageBoxRight';
     if (goRound % 2 == 0) {
-        item.className = 'messageBoxRight';
+        item.style.float = 'right';
+        item.style.clear = 'left';
+        goRound += 1;
     } else {
-        item.className = 'messageBoxLeft';
+        item.style.marginLeft = '2vw';
+        item.style.float = 'left';
+        item.style.clear = 'right';
+        goRound += 1;
     }
-    goRound += 1;
     item.textContent = msg;
     item.id = messageIdNumber;
     messageIdNumber += 1;
