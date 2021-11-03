@@ -1,7 +1,7 @@
 #chat-box {
-    overflow: auto;
     display: flex;
     flex-direction: column-reverse;
+    overflow: auto;
     width: 80%;
     height: 80vh;
     margin: auto;
@@ -30,29 +30,31 @@
 }
 
 .messageBoxRight {
-    display: flex;
+    font:x-small;
     margin-right: 2vw;
     margin-bottom: 0.3vh;
     max-width: 30%;
     border-radius: 1vw;
-    background-color: #5c95e9;
     padding: 0.5vw;
     float:  right;
     clear: right;
     word-wrap: break-word;
+    background-color: #5c95e9;
+    background-image: linear-gradient(#63ddcd, #5c95e9);
 }
 
 .messageBoxLeft {
-    display: flex;
+    font:x-small;
     margin-left: 2vw;
     margin-bottom: 0.3vh;
     max-width: 30%;
     border-radius: 1vw;
-    background-color: #5c95e9;
     padding: 0.5vw;
     float:  left;
     clear: left;
     word-wrap: break-word;
+    background-color: #5c95e9;
+    background-image: linear-gradient(#63ddcd, #5c95e9);
 }
 
 #menuBar{

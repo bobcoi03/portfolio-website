@@ -40,6 +40,8 @@ socket.on('chat message', function(msg, minutes, hours) {
     item.id = messageIdNumber;
     messageIdNumber += 1;
     messages.appendChild(item);
+    messages.appendChild(document.createElement('br'));
+
     window.scrollTo(0, document.body.scrollHeight);
 });
 
