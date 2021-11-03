@@ -29,7 +29,7 @@
     height: 5vh;
 }
 
-.messageBoxRight {
+.messageBox {
     font:x-small;
     margin-right: 2vw;
     margin-bottom: 0.3vh;
@@ -43,21 +43,23 @@
     background-image: linear-gradient(#63ddcd, #5c95e9);
 }
 
-/*
-.messageBoxLeft {
-    font:x-small;
-    margin-left: 2vw;
-    margin-bottom: 0.3vh;
-    max-width: 30%;
-    border-radius: 1vw;
-    padding: 0.5vw;
-    float:  left;
-    clear: left;
-    word-wrap: break-word;
-    background-color: #5c95e9;
-    background-image: linear-gradient(#63ddcd, #5c95e9);
+.messageBox .messageBox-hover {
+    visibility: hidden;
+    max-height: 25px;
+    background-color: black;
+    font-size: 8px;
+    text-align: center;
+    border-radius: 5px;
+    color: rgb(255, 255, 255);
+    /* position the tooltip */
+    position: relative;
+    float: center;
+    z-index: 1;
 }
-*/
+
+.messageBox:hover .messageBox-hover {
+    visibility: visible;
+}
 
 #menuBar{
     margin-top: 12px;

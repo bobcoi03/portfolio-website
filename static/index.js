@@ -13,7 +13,7 @@ form.addEventListener('submit', function(e) {
     const date = new Date();
     e.preventDefault();
     if (input.value) {
-        socket.emit('chat message', input.value, date.getMinutes().toString(), date.getHours().toString());
+        socket.emit('chat message', input.value, date.toString());
         input.value = '';
     }
 });
@@ -27,10 +27,13 @@ function getHeightOfPreviousMessage(messageId) {
     return heightOfGapBox; 
 }
 
-socket.on('chat message', function(msg, minutes, hours) {
+socket.on('chat message', function(msg, stringTimeObj) {
     var item = document.createElement('div');
-    var gapBetweenMessageBoxes = document.createElement('div');
-    item.className = 'messageBoxRight';
+    var displayDate = document.createElement('div');
+    displayDate.className = 'messageBox-hover';
+    displayDate.textContent = stringTimeObj;
+    item.className = 'messageBox';
+
     if (goRound % 2 == 0) {
         item.style.float = 'right';
         item.style.clear = 'left';
@@ -45,14 +48,12 @@ socket.on('chat message', function(msg, minutes, hours) {
     item.id = messageIdNumber;
     messageIdNumber += 1;
     messages.appendChild(item);
+    document.getElementById(String(messageIdNumber - 1)).appendChild(displayDate);
+    
     messages.appendChild(document.createElement('br'));
 
     window.scrollTo(0, document.body.scrollHeight);
 });
-
-//function keyboardResize(){
-//    document.getElementById("chat-box").style.height = "170px";
-//}
 
 // detect of user is on mobile return true or false
 function detectMob() {
