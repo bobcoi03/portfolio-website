@@ -7,6 +7,34 @@ var chatBox = document.getElementById("chat-box");
 var goRound = 0;
 var messageIdNumber = 1;
 
+function startRecording() {
+    alert("Microphone is pressed");
+}
+
+function displayImg() {
+    var file = document.getElementById('file-input').files[0];
+    //call the filereader
+    var reader  = new FileReader();
+    reader.onload = function(e)  {
+        //create the img tag
+        var image = document.createElement("img");
+        //get the image
+        image.src = e.target.result;
+        //resize the image
+        image.style.width = '100%';
+        image.style.height = '100%';
+
+        var imgBox = document.createElement('div');
+        imgBox.className = 'messageImgBox';
+        imgBox.id = "imgBoxId";
+
+        messages.appendChild(imgBox);
+        getImgBoxId = document.getElementById("imgBoxId");
+        getImgBoxId.appendChild(image);
+     }
+     reader.readAsDataURL(file);
+}
+
 form.addEventListener('submit', function(e) {
     var screenWidth = window.innerWidth;
     var screenHeight = window.innerHeight;
@@ -17,16 +45,6 @@ form.addEventListener('submit', function(e) {
         input.value = '';
     }
 });
-
-document.getElementById("file-input").addEventListener('change', function(){
-    const reader = new FileReader();
-    reader.onload = function() {
-        const base64 = this.result.replace(/.*base64,/, '');
-        socket.emit('image', base64);
-      };
-    reader.readAsDataURL(this.files[0]);
-
-}, false);
 
 socket.on('chat message', function(msg, stringTimeObj) {
     var item = document.createElement('div');

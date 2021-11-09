@@ -16,13 +16,14 @@
               <a class="nav-link active" aria-current="page" href="/login">SOur</a>
             </li>
         </ul>
+        <div id="nameOfMessageReceiver">Minh</div>
         <div id="chat-box">
             <div id="messages"></div>
             <!--id="messageBox" this is where users messages go-->
         </div>
         </div>
         <div class="chatBoxDiv">
-            <form id="sendButtonForm" action="" autocomplete="off"enctype="multipart/form-data"
+            <form id="sendButtonForm" action="" autocomplete="off"enctype="multipart/form-data">
                 <div class="input-group input-group-sm mb-3">
                     <span class="imageUpload">
                         <label for="file-input">
@@ -30,13 +31,14 @@
                         </label>
                         <input id="file-input"type="file"accept="image/*"/>
                     </span>
-                    <span>
+                    <span class="imageUpload">
                         <label for="sendVoiceMessage">
                             <img src="microphone-icon.png" id="microPhoneIconImg">
                         </label>
+                        <input id="sendVoiceMessage" type="submit" onclick="startRecording();false;"/>
                     </span>
                     <input style="border-color: #6c757d;"type="text" id="chatBox" class="form-control" placeholder="Write Message" aria-label="Recipient's username" aria-describedby="button-addon2">
-                    <button style="color: #0d6efd;"class="btn btn-outline-secondary" type="submit" id="button-addon2"></button>
+                    <button style="color: #0d6efd;"class="btn btn-outline-secondary" type="submit" id="button-addon2" onclick="displayImg();false;"></button>
                 </div>
             </form>
         </div>

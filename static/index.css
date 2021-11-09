@@ -2,8 +2,8 @@
     display: flex;
     flex-direction: column-reverse;
     overflow: auto;
-    width: 80%;
-    height: 75vh;
+    width: 100%;
+    min-height: 75vh;
     margin: auto;
     background-color:white;
     border-width:1px;
@@ -33,7 +33,6 @@
     width: 5vw;
     height: 5vh;
     border-radius: 0px 20px 20px 0px;
-    margin-right: 5px;
 }
 
 #button-addon2:hover {
@@ -53,10 +52,22 @@
     background-image: linear-gradient(#63ddcd, #5c95e9);
 }
 
+.messageImgBox {
+    font:x-small;
+    margin-right: 2vw;
+    margin-bottom: 0.3vh;
+    max-width: 30%;
+    border-radius: 1vw;
+    padding: 0.5vw;
+    float:  right;
+    clear: right;
+    word-wrap: break-word;
+    background-color:white;
+}
+
 .messageBox-hover {
     visibility: hidden;
-    max-width: 30%;
-    max-height: 25px;
+    max-width: 40%;
     background-color: transparent;
     font-size: 1vh;
     text-align: center;
@@ -96,6 +107,13 @@
 }
 
 #microPhoneIconImg {
-    width: 2.5vw;
-    height: 3vh;
+    margin-top: 1vh;
+    width: 3.8vw;
+    height: 2.9vh;
 }
+
+#nameOfMessageReceiver {
+    text-align: center;
+}
+
+
