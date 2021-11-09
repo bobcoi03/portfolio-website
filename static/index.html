@@ -22,10 +22,21 @@
         </div>
         </div>
         <div class="chatBoxDiv">
-            <form id="sendButtonForm" action="" autocomplete="off">
+            <form id="sendButtonForm" action="" autocomplete="off"enctype="multipart/form-data"
                 <div class="input-group input-group-sm mb-3">
+                    <span class="imageUpload">
+                        <label for="file-input">
+                            <img src="photo-frame-icon-simple-style-vector-8633178.jpg" id="imageUploadStyle">
+                        </label>
+                        <input id="file-input"type="file"accept="image/*"/>
+                    </span>
+                    <span>
+                        <label for="sendVoiceMessage">
+                            <img src="microphone-icon.png" id="microPhoneIconImg">
+                        </label>
+                    </span>
                     <input style="border-color: #6c757d;"type="text" id="chatBox" class="form-control" placeholder="Write Message" aria-label="Recipient's username" aria-describedby="button-addon2">
-                    <button style="color: #0d6efd;"class="btn btn-outline-secondary" type="submit" id="button-addon2">Send</button>
+                    <button style="color: #0d6efd;"class="btn btn-outline-secondary" type="submit" id="button-addon2"></button>
                 </div>
             </form>
         </div>

@@ -18,14 +18,15 @@ form.addEventListener('submit', function(e) {
     }
 });
 
-function getHeightOfPreviousMessage(messageId) {
-    // returns height for gapBetweenMessageBoxes
-    var heightOfGapBox = 0;
-    var previousMsg = document.getElementById(messageIdNumber -1);
-    heightOfGapBox = previousMsg.style.height;
+document.getElementById("file-input").addEventListener('change', function(){
+    const reader = new FileReader();
+    reader.onload = function() {
+        const base64 = this.result.replace(/.*base64,/, '');
+        socket.emit('image', base64);
+      };
+    reader.readAsDataURL(this.files[0]);
 
-    return heightOfGapBox; 
-}
+}, false);
 
 socket.on('chat message', function(msg, stringTimeObj) {
     var item = document.createElement('div');
@@ -37,11 +38,13 @@ socket.on('chat message', function(msg, stringTimeObj) {
     if (goRound % 2 == 0) {
         item.style.float = 'right';
         item.style.clear = 'left';
+        displayDate.style.float = 'right';
         goRound += 1;
     } else {
         item.style.marginLeft = '2vw';
         item.style.float = 'left';
         item.style.clear = 'right';
+        displayDate.style.float = 'left'; 
         goRound += 1;
     }
     item.textContent = msg;
