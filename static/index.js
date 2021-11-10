@@ -37,17 +37,15 @@ form.addEventListener('submit', function(e) {
 
 //receives io.emit('imageBlob') from main.js
 socket.on('imageBlob', function(dataUrl, stringTimeObj) {
+    var displayDate = document.createElement('div');
+    displayDate.className = 'messageImgBox-hover';
+    displayDate.textContent = stringTimeObj;
+
     var imageObj = new Image();
     imageObj.src = dataUrl;
+    imageObj.className = "messageImgBox";
 
-    var imgDiv = document.createElement('div');
-    imgDiv.className = 'messageImgBox';
-
-    imageObj.style.width = '100%';
-    imageObj.style.height = '100%';
-
-    messages.append(imgDiv);
-    getImgBoxId.appendChild(imageObj);
+    messages.appendChild(imageObj);
     messages.appendChild(displayDate);
     messages.appendChild(document.createElement('br'));
 });
@@ -62,13 +60,11 @@ socket.on('chat message', function(msg, stringTimeObj) {
 
     if (goRound % 2 == 0) {
         item.style.float = 'right';
-        item.style.clear = 'left';
         displayDate.style.float = 'right';
         goRound += 1;
     } else {
         item.style.marginLeft = '2vw';
         item.style.float = 'left';
-        item.style.clear = 'right';
         displayDate.style.float = 'left'; 
         goRound += 1;
     }
