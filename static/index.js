@@ -7,45 +7,52 @@ var chatBox = document.getElementById("chat-box");
 var goRound = 0;
 var messageIdNumber = 1;
 
-function startRecording() {
-    alert("Microphone is pressed");
+// returns date object of current time
+function currentTimeDateObj(){
+    const date = new Date();
+
+    return date;
 }
-
-function displayImg() {
-    var file = document.getElementById('file-input').files[0];
-    //call the filereader
-    var reader  = new FileReader();
-    reader.onload = function(e)  {
-        //create the img tag
-        var image = document.createElement("img");
-        //get the image
-        image.src = e.target.result;
-        //resize the image
-        image.style.width = '100%';
-        image.style.height = '100%';
-
-        var imgBox = document.createElement('div');
-        imgBox.className = 'messageImgBox';
-        imgBox.id = "imgBoxId";
-
-        messages.appendChild(imgBox);
-        getImgBoxId = document.getElementById("imgBoxId");
-        getImgBoxId.appendChild(image);
-     }
-     reader.readAsDataURL(file);
+// convert image to base64 returns base64 format from users local file system
+function encodeImageFileAsURL(element) {
+    console.log("encodeImageFileAsUrl() is called");
+    var file = element.files[0];
+    var reader = new FileReader();
+    reader.onloadend = function() {
+      console.log('RESULT', reader.result)
+      socket.emit("imageBlob", reader.result.toString(), currentTimeDateObj().toString());
+    }
+    reader.readAsDataURL(file);
 }
-
+// When send button is pressed
 form.addEventListener('submit', function(e) {
     var screenWidth = window.innerWidth;
     var screenHeight = window.innerHeight;
-    const date = new Date();
     e.preventDefault();
     if (input.value) {
-        socket.emit('chat message', input.value, date.toString());
+        socket.emit('chat message', input.value, currentTimeDateObj().toString());
         input.value = '';
     }
 });
 
+//receives io.emit('imageBlob') from main.js
+socket.on('imageBlob', function(dataUrl, stringTimeObj) {
+    var imageObj = new Image();
+    imageObj.src = dataUrl;
+
+    var imgDiv = document.createElement('div');
+    imgDiv.className = 'messageImgBox';
+
+    imageObj.style.width = '100%';
+    imageObj.style.height = '100%';
+
+    messages.append(imgDiv);
+    getImgBoxId.appendChild(imageObj);
+    messages.appendChild(displayDate);
+    messages.appendChild(document.createElement('br'));
+});
+
+// receives io.emit('chat message') from main.js or server-side
 socket.on('chat message', function(msg, stringTimeObj) {
     var item = document.createElement('div');
     var displayDate = document.createElement('div');
