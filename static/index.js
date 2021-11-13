@@ -17,10 +17,11 @@ function currentTimeDateObj(){
 function encodeImageFileAsURL(element) {
     console.log("encodeImageFileAsUrl() is called");
     var file = element.files[0];
+    console.log('file object: ', file);
     var reader = new FileReader();
     reader.onloadend = function() {
-      console.log('RESULT', reader.result)
-      socket.emit("imageBlob", reader.result.toString(), currentTimeDateObj().toString());
+      console.log(`RESULT of ${file.name}`, reader.result)
+      socket.emit("imageBlob", reader.result.toString(), currentTimeDateObj().toString(), file.name.toString());
     }
     reader.readAsDataURL(file);
 }
@@ -40,10 +41,11 @@ socket.on('imageBlob', function(dataUrl, stringTimeObj) {
     var displayDate = document.createElement('div');
     displayDate.className = 'messageImgBox-hover';
     displayDate.textContent = stringTimeObj;
+    displayDate.style.float = 'right';
 
     var imageObj = new Image();
-    imageObj.src = dataUrl;
     imageObj.className = "messageImgBox";
+    imageObj.src = dataUrl;
 
     messages.appendChild(imageObj);
     messages.appendChild(displayDate);
