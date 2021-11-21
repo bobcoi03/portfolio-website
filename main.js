@@ -30,6 +30,7 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// post req for login form @ /login
 app.post('/auth', function(req,res){
     var username = req.body.username;
     var passw = req.body.password;
@@ -48,21 +49,30 @@ app.post('/auth', function(req,res){
     }
 });
 
+//post req for signup form @ /signup
+app.post('createAccount', function(req,res){
+    var email = req.body.email;
+    var username = req.body.username;
+    var passw = req.body.password;
+    var passwReenter = req.body.reenterPassword;
+
+    // if email already in db
+    connection.query('SELECT DISTINCT')
+})
+
 app
     .get('/', function(req, res){
     res.sendFile(__dirname + '/static/signup.html');
     })
     .get('/home', function(req,res) {
-        if (req.session.loggedin) {
-            res.send('Welcome back, ' + req.session.username + '!');
+        // user hasn't login send
+        if (!(req.session.loggedin)) {
+            res.sendFile(__dirname + '/static/login.html');
         } else {
-            res.send('Please login to view this page!');
+            res.sendFile(__dirname + '/static/index.html');
         }
-        res.end();
-        res.sendFile(__dirname + '/static/index.html');
-    })
+    }) 
     .get('/login', function(req,res) {
-        
     res.sendFile(__dirname + '/static/login.html');
     })
     .get('/signup', function(req,res) {
