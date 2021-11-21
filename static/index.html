@@ -13,13 +13,19 @@
                 <input id="menuBar" type="image" src="3-dash-icon.png"/>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/login">SOur</a>
+              <a class="nav-link active" aria-current="page" href="/friends">SOur</a>
             </li>
         </ul>
         <div id="nameOfMessageReceiver">Minh</div>
         <div id="chat-box">
-            <div id="messages"></div>
-            <!--id="messageBox" this is where users messages go-->
+            <div id="messages">            <!--id="messageBox" this is where users messages go-->
+                <div class="videoDisplayClass">
+                    <video id="displayVideoId" width="100%"height="100%"autoplay>
+                        video display
+                    </video>
+                    <button onclick="stopStreamedVideo()">Stop</button>
+                </div>
+            </div>
         </div>
         </div>
         <div class="chatBoxDiv">
@@ -36,6 +42,12 @@
                             <img src="microphone-icon.png" id="microPhoneIconImg">
                         </label>
                         <input id="sendVoiceMessage" type="submit" onclick="startRecording();false;"/>
+                    </span>
+                    <span class="imageUpload">
+                        <label for="videoCall">
+                            <img src="video-call-icon-vector-30246149.jpg" id="videoCallImgId">
+                        </label>
+                        <input id="videoCall" type="submit" onclick="getPermissionToAccessCamera();">
                     </span>
                     <input style="border-color: #6c757d;"type="text" id="chatBox" class="form-control" placeholder="Write Message" aria-label="Recipient's username" aria-describedby="button-addon2">
                     <button style="color: #0d6efd;"class="btn btn-outline-secondary" type="submit" id="button-addon2"></button>

@@ -1,18 +1,52 @@
 var socket = io();
 
+// Important notice
+/* 
+    Starting with Chrome 47, getUserMedia()
+    requests are only allowed from secure origins: HTTPS or localhost.
+*/
+
 var messages = document.getElementById('messages');
 var form = document.getElementById('sendButtonForm');
 var input = document.getElementById('chatBox');
 var chatBox = document.getElementById("chat-box");
 var goRound = 0;
 var messageIdNumber = 1;
-
+var video = document.getElementById("displayVideoId");
+var streamGlobal;
 // returns date object of current time
 function currentTimeDateObj(){
     const date = new Date();
-
     return date;
 }
+
+// call this first when user presses video call icon
+
+// Get access to the camera!
+function getPermissionToAccessCamera(){
+    if(window.navigator.mediaDevices && window.navigator.mediaDevices.getUserMedia) {
+        console.log("Yo dude navigator is here");
+        // Not adding `{ audio: true }` since we only want video now
+        window.navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function(stream) {
+            streamGlobal = stream;
+            video.srcObject = streamGlobal;
+            video.play();
+        });
+    }
+}
+
+function stopStreamedVideo(){
+    console.log("removeVideoElem is called");
+    const stream = video.srcObject;
+    const tracks = stream.getTracks();
+
+    tracks.forEach(function(track){
+        track.stop();
+    });
+
+    video.srcObject = null;
+}
+
 // convert image to base64 returns base64 format from users local file system
 function encodeImageFileAsURL(element) {
     console.log("encodeImageFileAsUrl() is called");
@@ -21,7 +55,12 @@ function encodeImageFileAsURL(element) {
     var reader = new FileReader();
     reader.onloadend = function() {
       console.log(`RESULT of ${file.name}`, reader.result)
-      socket.emit("imageBlob", reader.result.toString(), currentTimeDateObj().toString(), file.name.toString());
+      // sends base64 data of Img to server-side 
+      socket.emit("imageBlob", reader.result, currentTimeDateObj().toString(), file.name.toString(), function(error, message){
+          console.log(error);
+          console.log(message);
+      }
+      );
     }
     reader.readAsDataURL(file);
 }
