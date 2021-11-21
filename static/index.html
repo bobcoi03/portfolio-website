@@ -10,7 +10,9 @@
     <body>
         <ul class="nav">
             <li class="nav-item">
-                <input id="menuBar" type="image" src="3-dash-icon.png"/>
+                <a href="/friends">
+                    <img src="3-dash-icon.png" id="menuBar">
+                </a>
             </li>
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/friends">SOur</a>
@@ -57,5 +59,11 @@
         <!--<script src="/socket.io/socket.io.js"></script>-->
         <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script>
         <script src="index.js"></script>
+        <!-- Import WebRTC adapter for compatibility with all the browsers  -->
+        <!-- Import TURN config -->
+        <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+        <script src="js\config.js"></script>
+        <!-- Import script containing WebRTC related functions
+        <script src="js\main.js"></script        -->
     </body>
 </html>

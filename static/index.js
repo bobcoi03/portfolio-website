@@ -125,4 +125,29 @@ function detectMob() {
     return ( ( window.innerWidth <= 850 ) && ( window.innerHeight <= 600 ) );
   }
 
+function callback(err){
+    console.log(err);
+}
+
+
+// returns dictionary-like object containing ip_address (public ip), isp_name, city, longitude, latitude, timezone 
+function httpGetAsync(url, callback) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+        callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", url, true); // true for asynchronous
+    xmlHttp.send(null);
+}
+
+var url = "https://ipgeolocation.abstractapi.com/v1/?api_key=795a9c083a3a41dda54f258e8e342fee";
+
+httpGetAsync(url, callback);
+
+
+
+
+
+
 
