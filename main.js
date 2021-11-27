@@ -12,13 +12,30 @@ var bodyParser = require('body-parser');
 var mysql2 = require('mysql2');
 const { request } = require('http');
 const port = 5000;
+const multer = require("multer");
 
-//start mysql connection
+const handleError = (err, res) => {
+    res
+      .status(500)
+      .contentType("text/plain")
+      .end("Oops! Something went wrong!");
+};
+
+const upload = multer({
+    dest: __dirname + '/static'
+    // you might also want to set some limits: https://github.com/expressjs/multer#limits
+  });
+
+//import search algos
+// users_information TABLE in USERS DB;
+const users_info = 'users_information';
+
+// start mysql connection
 var connection = mysql2.createConnection({
     host : 'localhost',
     user: 'bobcoi',
     password: 'Boby2003',
-    database: 'login'
+    database: 'USERS'
 });
 
 app.use(session({
@@ -35,7 +52,7 @@ app.post('/auth', function(req,res){
     var username = req.body.username;
     var passw = req.body.password;
     if (username&&passw) {
-        connection.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [username,passw], (error, results, fields)=>{
+        connection.query('SELECT * FROM users_information WHERE username = ? AND password = ?', [username,passw], (error, results, fields)=>{
             if (results.length > 0) {
                 req.session.loggedin = true;
                 req.session.username = username;
@@ -49,112 +66,141 @@ app.post('/auth', function(req,res){
     }
 });
 
+//search Algo linear returns if value in array items
+function linearSearch(items, value){
+    for (i=0; i < items.length;i++){
+        if (value == items[i]){
+            return true;
+        }
+    }
+    return false;
+}
 //post req for signup form @ /signup
-app.post('createAccount', function(req,res){
+app.post('/createAccount', function(req,res){
     var email = req.body.email;
     var username = req.body.username;
     var passw = req.body.password;
     var passwReenter = req.body.reenterPassword;
 
-    // if email already in db
-    connection.query('SELECT DISTINCT')
+    // if email already in TABLE: users_information
+    connection.query(`SELECT email FROM ${users_info}`, (err, result, fields)=>{
+        if (err) throw err;
+        let emailArray = [];
+
+        for(let i=0; i < result.length; i++) {
+            emailArray.push(result[i].email);
+        }
+        // checks if email already exits
+        if (!(linearSearch(emailArray,email))){
+            req.session.signedup = true;
+            res.redirect('/setupAccount');
+            res.end();
+
+        } else {
+            res.redirect('/signup');
+            res.end();
+
+        }
+    });
+    /*
+    // if username already in TABLE: users_information;
+    connection.query(`SELECT username FROM ${users_info}`, (err, result, fields)=> {
+        if (err) throw err;
+        // search algo
+    });
+
+    // INSERT INTO users_information (username,password,id)
+    connection.query(`INSERT INTO ${users_info} (username, email, password) VALUES (${username},${email},${passw})`)
+    */
 })
 
+app.get("/", express.static(path.join(__dirname, "./static")));
+
+app.post("/upload", upload.single("sendImage"),(req,res)=> {
+
+    const tempPath = req.file.path;
+    const targetPath = path.join(__dirname, "/uploads/image.png");
+
+    if (path.extname(req.file.originalname).toLowerCase() === ".png") {
+        fs.rename(tempPath, targetPath, err => {
+          if (err) return handleError(err, res);
+  
+          res
+            .status(200)
+            .contentType("text/plain")
+            .end("File uploaded!");
+        });
+    } else {
+        fs.unlink(tempPath, err => {
+          if (err) return handleError(err, res);
+  
+          res
+            .status(403)
+            .contentType("text/plain")
+            .end("Only .png files are allowed!");
+        });
+    }
+});
+
 app
+    .get("/image.png", (req, res) => {
+        res.sendFile(path.join(__dirname, "./uploads/image.png"));
+    })
+    .get('/scrap',(req,res) => {
+        res.sendFile(__dirname + '/public/scrap.html');
+    })
+
     .get('/', function(req, res){
-    res.sendFile(__dirname + '/static/signup.html');
+    res.sendFile(__dirname + '/static/login.html');
     })
     .get('/home', function(req,res) {
+        if (req.method == 'post') {
+            console.log("post request /home");
+        }
         // user hasn't login send
+        /*
         if (!(req.session.loggedin)) {
-            res.sendFile(__dirname + '/static/login.html');
+            res.redirect('/login');
         } else {
             res.sendFile(__dirname + '/static/index.html');
         }
+        */
+        res.sendFile(__dirname + '/static/index.html');
     }) 
     .get('/login', function(req,res) {
-    res.sendFile(__dirname + '/static/login.html');
+        res.sendFile(__dirname + '/static/login.html');
     })
     .get('/signup', function(req,res) {
-    res.sendFile(__dirname + '/static/signup.html');
+        res.sendFile(__dirname + '/static/signup.html');
     })
     .get('/friends', function(req,res){
-    res.sendFile(__dirname + '/static/friends.html');
+        res.sendFile(__dirname + '/static/friends.html');
     })
-// can use http://localhost:${port}/filename 
-app.use(express.static('static'));
+    .get('/setupAccount', function(req,res){
+        // if user hasn't setup
+        if (req.session.signedup) {
+            res.sendFile(__dirname + '/views/setupAccount.html');
+        } else {
+            req.session.signedup = false;
+            res.redirect('/signup');
+        }
+    })
+
+   // can use http://localhost:${port}/filename 
+   .use(express.static('static'));
 
 io.on("connection", (socket) => {
     console.log("user connected");
     socket.on('disconnect', () => {
         console.log('user disconnected')
     })
-    /* log server messages on client
-       arguments = array like object which contains all arguments of log() 
-    */
-    function log() {
-        var array = ['Message from server: '];
-        array.push.apply(array, arguments);
-        socket.emit('log', array);
-
-    }
-
-    // event 
-    socket.on('message', function(message, room) {
-        log('Client said: ', message);
-        //sends message to the room only
-        socket.in(room).emit('message', message, room);
-    })
-
-    // event for creating or joining a room
-    socket.on('create or join', function(room){
-        log('Received request to create or join room: ' + room);
-
-        var clientsInRoom = io.sockets.adapter.rooms[room];
-        var numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
-        log(`Room ${room} now has ${numClients} client(s)`);
-
-
-        // create room if noone in room
-        if (numClients===0){
-            socket.join(room);
-            log(`Client ID: ${socket.id} created room: ${room}`);
-
-        } else if (numClients===1) {
-            log(`Client ID: ${socket.id} joined room: ${room}`);
-        } else {
-            socket.emit('full', room);
-        }
-    })
-
-    //utilities event
-    socket.on('ipaddr', function(){
-        var ifaces = os.networkInterfaces();
-        for (var dev in ifaces) {
-            ifaces[dev].forEach(function(details){
-                if (details.family === 'IPv4' && details.address !== '127.0.0.1') {
-                    socket.emit('ipaddr', details.address);
-                };
-            });
-        }
-    })
-
-    //Event notifying other clients when client leaves room
-    socket.on('bye', function(){
-        console.log('received bye');
-    })
-
     // send = io.emit('x') & receive = socket.on('x')
     // receives chat msg, timeObj from user
     socket.on('chat message', (msg, stringTimeObj) => {
         io.emit('chat message', msg, stringTimeObj);
     })
-
     /* 
         Need to write something to send images > 1MB.
-
-
-
     */
     // Event for sending images blobs that are less than 800kb. 
     socket.on('imageBlob', (imageBlob, stringTimeObj, filename) => {
@@ -166,3 +212,17 @@ io.on("connection", (socket) => {
 httpServer.listen(port, () => {
     console.log(`Server running at port: ${port}`);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+

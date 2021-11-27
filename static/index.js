@@ -130,6 +130,10 @@ function callback(err){
 }
 
 
+/*
+const from = new google.maps.LatLng(lat1, lng1);
+const to = new google.maps.LatLng(lat2, lng2);
+const distance =  google.maps.geometry.spherical.computeDistanceBetween(from,to);
 // returns dictionary-like object containing ip_address (public ip), isp_name, city, longitude, latitude, timezone 
 function httpGetAsync(url, callback) {
     var xmlHttp = new XMLHttpRequest();
@@ -145,7 +149,7 @@ var url = "https://ipgeolocation.abstractapi.com/v1/?api_key=795a9c083a3a41dda54
 
 httpGetAsync(url, callback);
 
-
+*/
 
 
 
