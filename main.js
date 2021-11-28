@@ -165,28 +165,43 @@ app.post("/upload", upload.single("sendImage"),(req,res)=> {
 });
 */
 app.post('/upload', (req,res, next) => {
-    var form = new formidable.IncomingForm();
-    form.uploadDir = __dirname + '/uploads/images';
+    uploadFolder = __dirname + '/uploads/images';
+
+    var form = new formidable.IncomingForm({ uploadDir: uploadFolder });
+
     form.parse(req, (err, fields, files) => {
         if(err){
             next(err);
             return;
         }
 
-        var oldPath = './' + files.inputname.path;
-        var newPath = `./uploads/images/${files.inputname}`;
-        fs.rename(oldPath, newPath, (err) =>{
-            if(err) throw err;
-        });
+
+        const file = files.sendImage;
+
+        console.log('file obj');
+        console.log(file);
+
+        // creates a valid name by removing spaces
+        const fileName = encodeURIComponent(file.originalFilename.replace(/\s/g, "-"));
+
+        try {
+            fs.renameSync(file.filepath, (`${uploadFolder}/${fileName}`));
+
+        } catch (err) {
+            console.log(err);
+        }
     });
-    res.end();
 });
 
 app
     .use(express.static('uploads'))
 
     .get('/rooms', (req,res) => {
-        res.sendFile(__dirname + '/static/rooms.html');
+        if (!(req.session.loggedin)){
+            res.redirect('/login');
+        } else{
+            res.sendFile(__dirname + '/static/rooms.html');
+        }
     })
 
     .get("/image.png", (req, res) => {
@@ -258,10 +273,6 @@ io.on("connection", (socket) => {
 httpServer.listen(port, () => {
     console.log(`Server running at port: ${port}`);
 });
-
-
-
-
 
 
 
