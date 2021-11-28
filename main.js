@@ -15,6 +15,10 @@ const port = 5000;
 const multer = require("multer");
 const formidable = require("formidable");
 
+
+// socketio room number. Join on app.post('/joinRoom')
+let roomNumber;
+
 const handleError = (err, res) => {
     res
       .status(500)
@@ -49,7 +53,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 //join room
 app.post('/joinRoom', (req,res)=> {
-    const roomNumber = req.body.roomNumber;
+    roomNumber = req.body.roomNumber;
 
     io.on("connection", (socket) => {
         socket.join(roomNumber);
@@ -239,7 +243,7 @@ io.on("connection", (socket) => {
     // send = io.emit('x') & receive = socket.on('x')
     // receives chat msg, timeObj from user
     socket.on('chat message', (msg, stringTimeObj) => {
-        io.emit('chat message', msg, stringTimeObj);
+        io.to(roomNumber).emit('chat message', msg, stringTimeObj);
     })
     /* 
         Need to write something to send images > 1MB.
