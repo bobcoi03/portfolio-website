@@ -14,6 +14,7 @@ const { request } = require('http');
 const port = 5000;
 const multer = require("multer");
 const formidable = require("formidable");
+const { emit } = require('process');
 
 
 // socketio room number. Join on app.post('/joinRoom')
@@ -175,7 +176,6 @@ app.post('/upload', (req,res, next) => {
             return;
         }
 
-
         const file = files.sendImage;
 
         console.log('file obj');
@@ -186,6 +186,11 @@ app.post('/upload', (req,res, next) => {
 
         try {
             fs.renameSync(file.filepath, (`${uploadFolder}/${fileName}`));
+            // send path to imagefile for display using socketio
+
+            // for socketio
+            path_to_file = `/images/${fileName}`;
+            io.to(roomNumber).emit('path_to_image', path_to_file);
 
         } catch (err) {
             console.log(err);
@@ -248,6 +253,7 @@ app
     })
        // can use http://localhost:${port}/filename 
     .use(express.static('static'))
+    .use(express.static('uploads'))
 
 io.on("connection", (socket) => {
     console.log("user connected");

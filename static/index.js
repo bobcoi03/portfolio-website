@@ -91,6 +91,7 @@ form.addEventListener('submit', function(e) {
 
 //receives path to image file
 socket.on('path_to_image', (path_to_image) => {
+    const stringTimeObj = new Date();
     console.log("received path to image on server side");
     var displayDate = document.createElement('div');
     displayDate.className = 'messageImgBox-hover';
