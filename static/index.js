@@ -20,6 +20,19 @@ function currentTimeDateObj(){
     return date;
 }
 
+function submit(form_id){
+    form = document.getElementById(form_id);
+    form.submit();
+}
+
+// Ajax POST request .send(FormData to '/upload')
+function sendFormData(form_id){
+    var ajax = new XMLHttpRequest();
+    var data = document.getElementById(form_id);
+    var formData = new FormData(data);
+    ajax.open("post", "/upload");
+    ajax.send(formData);
+}
 // call this first when user presses video call icon
 
 // Get access to the camera!
@@ -75,6 +88,23 @@ form.addEventListener('submit', function(e) {
     }
 });
 
+//receives path to image file
+socket.on('path_to_image', (path_to_image) => {
+    console.log("received path to image on server side");
+    var displayDate = document.createElement('div');
+    displayDate.className = 'messageImgBox-hover';
+    displayDate.textContent = stringTimeObj;
+    displayDate.style.float = 'right';
+
+    var imageObj = new Image();
+    imageObj.className = "messageImgBox";
+    imageObj.src = path_to_image;
+
+    messages.appendChild(imageObj);
+    messages.appendChild(displayDate);
+    messages.appendChild(document.createElement('br'));
+})
+
 //receives io.emit('imageBlob') from main.js
 socket.on('imageBlob', function(dataUrl, stringTimeObj) {
     var displayDate = document.createElement('div');
@@ -128,8 +158,7 @@ function detectMob() {
 function callback(err){
     console.log(err);
 }
-
-
+function send
 /*
 const from = new google.maps.LatLng(lat1, lng1);
 const to = new google.maps.LatLng(lat2, lng2);

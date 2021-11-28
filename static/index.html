@@ -30,11 +30,15 @@
             </div>
         </div>
         <div class="chatBoxDiv">
-                    <span class="imageUpload">
-                        <label for="selectImgIcon">
-                            <img src="photo-frame-icon-simple-style-vector-8633178.jpg" id="imageUploadStyle">
-                        </label>
-                    </span>
+                <div class="input-group input-group-sm mb-3">
+                    <form id="imageUpload"method="post"action="/upload" enctype="multipart/form-data">
+                        <span class="imageUpload">
+                            <label for="selectImgIcon">
+                                <img src="photo-frame-icon-simple-style-vector-8633178.jpg" id="imageUploadStyle">
+                            </label>
+                            <input id="selectImgIcon" type="file" name="sendImage" onchange="submit('imageUpload')">
+                        </span>
+                    </form>
                     <span class="imageUpload">
                         <label for="sendVoiceMessage">
                             <img src="microphone-icon.png" id="microPhoneIconImg">
@@ -47,13 +51,14 @@
                         </label>
                         <input id="videoCall" type="submit" onclick="getPermissionToAccessCamera();">
                     </span>
-                    <input style="border-color: #6c757d;"type="text" id="chatBox" class="form-control" placeholder="Write Message" aria-label="Recipient's username" aria-describedby="button-addon2"autocomplete="off">
-                    <button style="color: #0d6efd;"class="btn btn-outline-secondary" type="submit" id="button-addon2"></button>
+            
+                    <form id="sendButtonForm"style="display: flex;">
+                        <input style="border-color: #6c757d;"type="text" id="chatBox" class="form-control" placeholder="Write Message" aria-label="Recipient's username" aria-describedby="button-addon2"autocomplete="off">
+                        <button style="color: #0d6efd;"class="btn btn-outline-secondary" type="submit" id="button-addon2"></button>                
+                        
+                    </form>
+                </div>
         </div>
-        <form method="post"action="/upload" enctype="multipart/form-data">
-            <input id="selectImgIcon" type="file" name="sendImage">
-            <button type="submit">Submit</button>
-        </form>
         <!--<script src="/socket.io/socket.io.js"></script>-->
         <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script>
         <script src="index.js"></script>

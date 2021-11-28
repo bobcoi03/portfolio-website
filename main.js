@@ -114,21 +114,30 @@ app.post('/createAccount', function(req,res){
     */
 })
 
-app.get("/", express.static(path.join(__dirname, "./static")));
-
+/*
+// images are uploaded to /uploads/images/
 app.post("/upload", upload.single("sendImage"),(req,res)=> {
 
     const tempPath = req.file.path;
-    const targetPath = path.join(__dirname, "/uploads/image.png");
+    const targetPath = path.join(__dirname, `/uploads/images/${req.file.originalname}`);
+
+    let path_to_image = `images/${req.file.originalname}`;
 
     if (path.extname(req.file.originalname).toLowerCase() === ".png") {
+
+        // save file
         fs.rename(tempPath, targetPath, err => {
           if (err) return handleError(err, res);
+
+          // sent to /static/index.js
+          io.emit('path_to_image', path_to_image);
+
+          console.log(`File saved to: ${targetPath}`);
   
           res
             .status(200)
             .contentType("text/plain")
-            .end("File uploaded!");
+            .redirect('/home')
         });
     } else {
         fs.unlink(tempPath, err => {
@@ -141,8 +150,9 @@ app.post("/upload", upload.single("sendImage"),(req,res)=> {
         });
     }
 });
-
+*/
 app
+    .use(express.static('uploads'))
     .get("/image.png", (req, res) => {
         res.sendFile(path.join(__dirname, "./uploads/image.png"));
     })
@@ -185,9 +195,8 @@ app
             res.redirect('/signup');
         }
     })
-
-   // can use http://localhost:${port}/filename 
-   .use(express.static('static'));
+       // can use http://localhost:${port}/filename 
+    .use(express.static('static'))
 
 io.on("connection", (socket) => {
     console.log("user connected");
@@ -212,6 +221,8 @@ io.on("connection", (socket) => {
 httpServer.listen(port, () => {
     console.log(`Server running at port: ${port}`);
 });
+
+
 
 
 
