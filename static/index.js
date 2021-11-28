@@ -26,12 +26,13 @@ function submit(form_id){
 }
 
 // Ajax POST request .send(FormData to '/upload')
-function sendFormData(form_id){
+function sendFormData(){
     var ajax = new XMLHttpRequest();
-    var data = document.getElementById(form_id);
-    var formData = new FormData(data);
-    ajax.open("post", "/upload");
-    ajax.send(formData);
+    var data = document.getElementById('imageUpload');
+    var fileData = new FormData(data);
+    ajax.open("POST", "/upload", true);
+    ajax.send(fileData);
+    return false;
 }
 // call this first when user presses video call icon
 
@@ -158,7 +159,6 @@ function detectMob() {
 function callback(err){
     console.log(err);
 }
-function send
 /*
 const from = new google.maps.LatLng(lat1, lng1);
 const to = new google.maps.LatLng(lat2, lng2);

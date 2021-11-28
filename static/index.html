@@ -31,12 +31,12 @@
         </div>
         <div class="chatBoxDiv">
                 <div class="input-group input-group-sm mb-3">
-                    <form id="imageUpload"method="post"action="/upload" enctype="multipart/form-data">
+                    <form id="imageUpload"enctype="multipart/form-data">
                         <span class="imageUpload">
                             <label for="selectImgIcon">
                                 <img src="photo-frame-icon-simple-style-vector-8633178.jpg" id="imageUploadStyle">
                             </label>
-                            <input id="selectImgIcon" type="file" name="sendImage" onchange="submit('imageUpload')">
+                            <input id="selectImgIcon" type="file" name="sendImage" onchange="sendFormData()">
                         </span>
                     </form>
                     <span class="imageUpload">

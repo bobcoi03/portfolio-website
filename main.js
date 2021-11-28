@@ -13,6 +13,7 @@ var mysql2 = require('mysql2');
 const { request } = require('http');
 const port = 5000;
 const multer = require("multer");
+const formidable = require("formidable");
 
 const handleError = (err, res) => {
     res
@@ -46,7 +47,17 @@ app.use(session({
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+//join room
+app.post('/joinRoom', (req,res)=> {
+    const roomNumber = req.body.roomNumber;
 
+    io.on("connection", (socket) => {
+        socket.join(roomNumber);
+        console.log(`Joined room: ${roomNumber}`);
+    });
+    res.redirect('/home');
+    res.end();
+})
 // post req for login form @ /login
 app.post('/auth', function(req,res){
     var username = req.body.username;
@@ -56,7 +67,7 @@ app.post('/auth', function(req,res){
             if (results.length > 0) {
                 req.session.loggedin = true;
                 req.session.username = username;
-                res.redirect('/home');
+                res.redirect('/rooms');
             } else {
                 res.send('Incorrect Username and/or Password!');
             }
@@ -136,8 +147,6 @@ app.post("/upload", upload.single("sendImage"),(req,res)=> {
   
           res
             .status(200)
-            .contentType("text/plain")
-            .redirect('/home')
         });
     } else {
         fs.unlink(tempPath, err => {
@@ -151,8 +160,31 @@ app.post("/upload", upload.single("sendImage"),(req,res)=> {
     }
 });
 */
+app.post('/upload', (req,res, next) => {
+    var form = new formidable.IncomingForm();
+    form.uploadDir = __dirname + '/uploads/images';
+    form.parse(req, (err, fields, files) => {
+        if(err){
+            next(err);
+            return;
+        }
+
+        var oldPath = './' + files.inputname.path;
+        var newPath = `./uploads/images/${files.inputname}`;
+        fs.rename(oldPath, newPath, (err) =>{
+            if(err) throw err;
+        });
+    });
+    res.end();
+});
+
 app
     .use(express.static('uploads'))
+
+    .get('/rooms', (req,res) => {
+        res.sendFile(__dirname + '/static/rooms.html');
+    })
+
     .get("/image.png", (req, res) => {
         res.sendFile(path.join(__dirname, "./uploads/image.png"));
     })
@@ -200,6 +232,7 @@ app
 
 io.on("connection", (socket) => {
     console.log("user connected");
+
     socket.on('disconnect', () => {
         console.log('user disconnected')
     })
