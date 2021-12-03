@@ -15,10 +15,11 @@ const port = 5000;
 const multer = require("multer");
 const formidable = require("formidable");
 const { emit } = require('process');
-
+const SHA256 = require("crypto-js/sha256");
 
 // socketio room number. Join on app.post('/joinRoom')
 let roomNumber;
+let userName;
 
 const handleError = (err, res) => {
     res
@@ -27,12 +28,6 @@ const handleError = (err, res) => {
       .end("Oops! Something went wrong!");
 };
 
-const upload = multer({
-    dest: __dirname + '/static'
-    // you might also want to set some limits: https://github.com/expressjs/multer#limits
-  });
-
-//import search algos
 // users_information TABLE in USERS DB;
 const users_info = 'users_information';
 
@@ -58,7 +53,7 @@ app.post('/joinRoom', (req,res)=> {
 
     io.on("connection", (socket) => {
         socket.join(roomNumber);
-        console.log(`Joined room: ${roomNumber}`);
+        console.log(`User: ${req.session.username} Joined room: ${roomNumber}`);
     });
     res.redirect('/home');
     res.end();
@@ -67,11 +62,15 @@ app.post('/joinRoom', (req,res)=> {
 app.post('/auth', function(req,res){
     var username = req.body.username;
     var passw = req.body.password;
+
     if (username&&passw) {
-        connection.query('SELECT * FROM users_information WHERE username = ? AND password = ?', [username,passw], (error, results, fields)=>{
+        var decrypt_passw = SHA256(passw).toString();
+        connection.query('SELECT * FROM users_information WHERE username = ? AND password = ?', [username, decrypt_passw], (error, results, fields)=>{
             if (results.length > 0) {
                 req.session.loggedin = true;
                 req.session.username = username;
+                // set global userName variable
+                userName = toString(username);
                 res.redirect('/rooms');
             } else {
                 res.send('Incorrect Username and/or Password!');
@@ -89,35 +88,51 @@ function linearSearch(items, value){
             return true;
         }
     }
+    // returns false if items not in db
     return false;
 }
 //post req for signup form @ /signup
 app.post('/createAccount', function(req,res){
+    var phoneNumber = req.body.telephone;
     var email = req.body.email;
     var username = req.body.username;
     var passw = req.body.password;
     var passwReenter = req.body.reenterPassword;
+    let emailArray = [];
+    
+    // if passw && passwRe not same
+    if (!(passw === passwReenter)) {
+        res.redirect('/signup');
+    }
 
     // if email already in TABLE: users_information
     connection.query(`SELECT email FROM ${users_info}`, (err, result, fields)=>{
         if (err) throw err;
-        let emailArray = [];
 
         for(let i=0; i < result.length; i++) {
             emailArray.push(result[i].email);
         }
-        // checks if email already exits
-        if (!(linearSearch(emailArray,email))){
-            req.session.signedup = true;
-            res.redirect('/setupAccount');
-            res.end();
+    })
+        // checks if email already exits --> add info to table db
+    if (!(linearSearch(emailArray,email))){
+        //encrypt passw
+        passw = SHA256(passw).toString();
+        var insert = `INSERT INTO users_information (username, email, password, id) VALUES ('${username}', '${email}','${passw.toString()}',3)`;
+        
+        connection.query(insert, (err,result)=> {
+            if (err) throw err;
+        })
+        console.log(`Added User info of: ${username} into users_information`);
+        
+        req.session.signedup = true;
+        res.redirect('/setupAccount');
+        res.end();
 
-        } else {
-            res.redirect('/signup');
-            res.end();
+    } else {
+        res.redirect('/signup');
+        res.end();
 
-        }
-    });
+    }
     /*
     // if username already in TABLE: users_information;
     connection.query(`SELECT username FROM ${users_info}`, (err, result, fields)=> {
@@ -199,8 +214,6 @@ app.post('/upload', (req,res, next) => {
 });
 
 app
-    .use(express.static('uploads'))
-
     .get('/rooms', (req,res) => {
         if (!(req.session.loggedin)){
             res.redirect('/login');
@@ -217,7 +230,7 @@ app
     })
 
     .get('/', function(req, res){
-    res.sendFile(__dirname + '/static/login.html');
+        res.redirect('/login');
     })
     .get('/home', function(req,res) {
         if (req.method == 'post') {
@@ -256,7 +269,7 @@ app
     .use(express.static('uploads'))
 
 io.on("connection", (socket) => {
-    console.log("user connected");
+    // on app.get("/rooms") or app.get("/home")
 
     socket.on('disconnect', () => {
         console.log('user disconnected')
@@ -269,14 +282,9 @@ io.on("connection", (socket) => {
     /* 
         Need to write something to send images > 1MB.
     */
-    // Event for sending images blobs that are less than 800kb. 
-    socket.on('imageBlob', (imageBlob, stringTimeObj, filename) => {
-        console.log(`server receives base64 of ${filename}: `, imageBlob);
-        io.emit('imageBlob', imageBlob, stringTimeObj);
-    })
 });
 
-httpServer.listen(port, () => {
+httpServer.listen(port, '0.0.0.0', () => {
     console.log(`Server running at port: ${port}`);
 });
 
