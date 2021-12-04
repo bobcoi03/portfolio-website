@@ -16,18 +16,11 @@ const multer = require("multer");
 const formidable = require("formidable");
 const { emit } = require('process');
 const SHA256 = require("crypto-js/sha256");
+const { connect } = require('http2');
 
 // socketio room number. Join on app.post('/joinRoom')
 let roomNumber;
 let userName;
-
-const handleError = (err, res) => {
-    res
-      .status(500)
-      .contentType("text/plain")
-      .end("Oops! Something went wrong!");
-};
-
 // users_information TABLE in USERS DB;
 const users_info = 'users_information';
 
@@ -40,6 +33,7 @@ var connection = mysql2.createConnection({
 });
 
 app.use(session({
+    cookie: { maxAge: 8*60*1000},
     secret: 'secret LOLOL',
     resave: true,
     saveUninitialized: true
@@ -47,17 +41,7 @@ app.use(session({
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-//join room
-app.post('/joinRoom', (req,res)=> {
-    roomNumber = req.body.roomNumber;
 
-    io.on("connection", (socket) => {
-        socket.join(roomNumber);
-        console.log(`User: ${req.session.username} Joined room: ${roomNumber}`);
-    });
-    res.redirect('/home');
-    res.end();
-})
 // post req for login form @ /login
 app.post('/auth', function(req,res){
     var username = req.body.username;
@@ -71,26 +55,15 @@ app.post('/auth', function(req,res){
                 req.session.username = username;
                 // set global userName variable
                 userName = toString(username);
-                res.redirect('/rooms');
+                res.redirect('/contacts');
             } else {
                 res.send('Incorrect Username and/or Password!');
             }
-
             res.end();
         });
     }
 });
 
-//search Algo linear returns if value in array items
-function linearSearch(items, value){
-    for (i=0; i < items.length;i++){
-        if (value == items[i]){
-            return true;
-        }
-    }
-    // returns false if items not in db
-    return false;
-}
 //post req for signup form @ /signup
 app.post('/createAccount', function(req,res){
     var phoneNumber = req.body.telephone;
@@ -145,41 +118,68 @@ app.post('/createAccount', function(req,res){
     */
 })
 
-/*
-// images are uploaded to /uploads/images/
-app.post("/upload", upload.single("sendImage"),(req,res)=> {
+// 
+app.post('/goToChatRoom', (req,res)=> {
+    // check if room already exists in table rooms @ DB Users;
 
-    const tempPath = req.file.path;
-    const targetPath = path.join(__dirname, `/uploads/images/${req.file.originalname}`);
+    // Array of all room ids that already exists in TABLE rooms @ DATABASE Users
+    let room_id_array = [];
 
-    let path_to_image = `images/${req.file.originalname}`;
+    connection.query(`SELECT room_id FROM rooms`, (err, result) => {
+        for (let i = 0; i < result.length; i++) {
+            room_id_array.push(result[i].room_id);
 
-    if (path.extname(req.file.originalname).toLowerCase() === ".png") {
+            room_id_array.sort((a, b) => {
+                return a - b;
+            })
+        }
+    })
 
-        // save file
-        fs.rename(tempPath, targetPath, err => {
-          if (err) return handleError(err, res);
+    connection.query(
+        `SELECT * FROM rooms WHERE (user_1 = '${req.session.username}' AND user_2 = '${req.body.username}')
+        OR (user_1 = '${req.body.username}' AND user_2 = '${req.session.username}')
+    `, (err, result)=> {
+        if (err) throw err;
+        console.log(`Room already exists:\nResults: ${result[0]}`);
+        // If room already exists
+        if (result.length > 0) {
+            roomNumber = result[0].room_id;
+            console.log(roomNumber);
+            io.on("connection", (socket) => {
+                socket.join(roomNumber);
 
-          // sent to /static/index.js
-          io.emit('path_to_image', path_to_image);
+                io.to(roomNumber).emit('username_of_friend', req.body.username.toString());
 
-          console.log(`File saved to: ${targetPath}`);
-  
-          res
-            .status(200)
-        });
-    } else {
-        fs.unlink(tempPath, err => {
-          if (err) return handleError(err, res);
-  
-          res
-            .status(403)
-            .contentType("text/plain")
-            .end("Only .png files are allowed!");
-        });
-    }
+                console.log(`User: ${req.session.username} Joined room: ${roomNumber}`);
+            });
+        // If room doesn't exist
+        } else {
+
+            let lastItem = room_id_array[room_id_array.length - 1];
+            lastItem += 1;
+
+            connection.query(`
+            
+                INSERT INTO rooms
+                (room_id, user_1, user_2) VALUES 
+                (${lastItem},'${req.session.username}','${req.body.username}')`, (err) => {
+            
+            if (err) throw err;
+            
+            io.on("connection", (socket) => {
+                console.log(`CREATED NEW ROOM: ${lastItem}`);
+                roomNumber = lastItem;
+                socket.join(roomNumber);
+                console.log(`User: ${req.session.username} Joined room: ${roomNumber}`);
+            });
+
+            })
+        }
+    })
+    res.redirect('/home');
+    res.end();
 });
-*/
+
 app.post('/upload', (req,res, next) => {
     uploadFolder = __dirname + '/uploads/images';
 
@@ -192,9 +192,6 @@ app.post('/upload', (req,res, next) => {
         }
 
         const file = files.sendImage;
-
-        console.log('file obj');
-        console.log(file);
 
         // creates a valid name by removing spaces
         const fileName = encodeURIComponent(file.originalFilename.replace(/\s/g, "-"));
@@ -211,9 +208,17 @@ app.post('/upload', (req,res, next) => {
             console.log(err);
         }
     });
+    res.end();
 });
 
 app
+    .get('/contacts', (req,res)=> {
+        if (!(req.session.loggedin)) {
+            res.redirect('/login');
+        } else {
+            res.sendFile(__dirname + '/static/contacts.html');
+        }
+    })
     .get('/rooms', (req,res) => {
         if (!(req.session.loggedin)){
             res.redirect('/login');
@@ -269,7 +274,7 @@ app
     .use(express.static('uploads'))
 
 io.on("connection", (socket) => {
-    // on app.get("/rooms") or app.get("/home")
+    // on app.get("/contacts") or app.get("/home")
 
     socket.on('disconnect', () => {
         console.log('user disconnected')
@@ -284,11 +289,30 @@ io.on("connection", (socket) => {
     */
 });
 
+
 httpServer.listen(port, '0.0.0.0', () => {
     console.log(`Server running at port: ${port}`);
 });
 
+console.log(userName);
 
+//search Algo linear returns if value in array items
+function linearSearch(items, value){
+    for (i=0; i < items.length;i++){
+        if (value == items[i]){
+            return true;
+        }
+    }
+    // returns false if items not in db
+    return false;
+}
+
+const handleError = (err, res) => {
+    res
+      .status(500)
+      .contentType("text/plain")
+      .end("Oops! Something went wrong!");
+};
 
 
 

@@ -10,7 +10,7 @@
     <body>
         <ul class="nav">
             <li class="nav-item">
-                <a href="/friends">
+                <a href="/login">
                     <img src="3-dash-icon.png" id="menuBar">
                 </a>
             </li>
@@ -21,12 +21,6 @@
         <div id="nameOfMessageReceiver">Minh</div>
         <div id="chat-box">
             <div id="messages">            <!--id="messageBox" this is where users messages go-->
-                <div class="videoDisplayClass">
-                    <video id="displayVideoId" width="100%"height="100%"autoplay>
-                        video display
-                    </video>
-                    <button onclick="stopStreamedVideo()">Stop</button>
-                </div>
             </div>
         </div>
         <div class="chatBoxDiv">
@@ -36,7 +30,7 @@
                             <label for="selectImgIcon">
                                 <img src="photo-frame-icon-simple-style-vector-8633178.jpg" id="imageUploadStyle">
                             </label>
-                            <input id="selectImgIcon" type="file" name="sendImage" onchange="sendFormData()">
+                            <input id="selectImgIcon" type="file" name="sendImage" accept="image/*"onchange="sendFormData()">
                         </span>
                     </form>
                     <span class="imageUpload">
@@ -49,7 +43,7 @@
                         <label for="videoCall">
                             <img src="video-call-icon-vector-30246149.jpg" id="videoCallImgId">
                         </label>
-                        <input id="videoCall" type="submit" onclick="getPermissionToAccessCamera();">
+                        <input id="videoCall" type="submit" onclick="">
                     </span>
             
                     <form id="sendButtonForm"style="display: flex;">

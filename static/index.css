@@ -44,6 +44,8 @@
     margin-right: 2vw;
     margin-bottom: 0.3vh;
     max-width: 30%;
+
+    
     border-radius: 1vw;
     padding: 0.5vw;
     float:  right;
@@ -138,4 +140,7 @@
     text-align: center;
 }
 
-
+#videoCallBox {
+    z-index: 1;
+    margin: ;
+}

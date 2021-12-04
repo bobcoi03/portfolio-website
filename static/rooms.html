@@ -4,6 +4,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8">
         <title>Join room</title>
         <style>
+			.login-form {
+			width: 300px;
+			margin: 0 auto;
+			font-family: Tahoma, Geneva, sans-serif;
+			}
             .login-form input[type="number"] {
 			width: 100%;
 			padding: 15px;
@@ -31,11 +36,13 @@
         </style>
     </head>
     <body>
-        <form class="login-form" id="joinRoom" method="post" action="/joinRoom">
-            <h1 style="color: #0d6efd;">Join Room</h1>
-            <input type="number" name="roomNumber" required>
-            <input type="submit">
-        </form>
+		<div class="login-form">
+        	<form class="login-form" id="joinRoom" method="post" action="/joinRoom">
+            	<h1 style="color: #0d6efd;">Join Room</h1>
+            	<input type="number" name="roomNumber" required>
+            	<input type="submit">
+        	</form>
+		</div>
         <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script>
         <script src="rooms.js"></script>
     </body>

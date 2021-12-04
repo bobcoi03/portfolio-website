@@ -36,7 +36,7 @@ function sendFormData(){
 }
 // call this first when user presses video call icon
 
-// Get access to the camera!
+// Get access to the camera! and start recording
 function getPermissionToAccessCamera(){
     if(window.navigator.mediaDevices && window.navigator.mediaDevices.getUserMedia) {
         console.log("Yo dude navigator is here");
@@ -60,24 +60,6 @@ function stopStreamedVideo(){
 
     video.srcObject = null;
 }
-
-// convert image to base64 returns base64 format from users local file system
-function encodeImageFileAsURL(element) {
-    console.log("encodeImageFileAsUrl() is called");
-    var file = element.files[0];
-    console.log('file object: ', file);
-    var reader = new FileReader();
-    reader.onloadend = function() {
-      console.log(`RESULT of ${file.name}`, reader.result)
-      // sends base64 data of Img to server-side 
-      socket.emit("imageBlob", reader.result, currentTimeDateObj().toString(), file.name.toString(), function(error, message){
-          console.log(error);
-          console.log(message);
-      }
-      );
-    }
-    reader.readAsDataURL(file);
-}
 // When send button is pressed
 form.addEventListener('submit', function(e) {
     var screenWidth = window.innerWidth;
@@ -88,6 +70,12 @@ form.addEventListener('submit', function(e) {
         input.value = '';
     }
 });
+
+//receives username of friend
+socket.on('username_of_friend', (username_of_friend) => {
+    document.getElementById('nameOfMessageReceiver').innerHTML = username_of_friend;
+})
+
 
 //receives path to image file
 socket.on('path_to_image', (path_to_image) => {
@@ -107,22 +95,6 @@ socket.on('path_to_image', (path_to_image) => {
     messages.appendChild(document.createElement('br'));
 })
 
-//receives io.emit('imageBlob') from main.js
-socket.on('imageBlob', function(dataUrl, stringTimeObj) {
-    var displayDate = document.createElement('div');
-    displayDate.className = 'messageImgBox-hover';
-    displayDate.textContent = stringTimeObj;
-    displayDate.style.float = 'right';
-
-    var imageObj = new Image();
-    imageObj.className = "messageImgBox";
-    imageObj.src = dataUrl;
-
-    messages.appendChild(imageObj);
-    messages.appendChild(displayDate);
-    messages.appendChild(document.createElement('br'));
-});
-
 // receives io.emit('chat message') from main.js or server-side
 socket.on('chat message', function(msg, stringTimeObj) {
     var item = document.createElement('div');
@@ -131,13 +103,22 @@ socket.on('chat message', function(msg, stringTimeObj) {
     displayDate.textContent = stringTimeObj;
     item.className = 'messageBox';
 
+
+    // set max-width to 60% if on mobile 
+    if (windowWidth() < 450) {
+        item.style.maxWidth = '60%';
+    }
+
+
     if (goRound % 2 == 0) {
         item.style.float = 'right';
         displayDate.style.float = 'right';
         goRound += 1;
+
     } else {
         item.style.marginLeft = '2vw';
         item.style.float = 'left';
+        
         displayDate.style.float = 'left'; 
         goRound += 1;
     }
@@ -156,6 +137,16 @@ socket.on('chat message', function(msg, stringTimeObj) {
 function detectMob() {
     return ( ( window.innerWidth <= 850 ) && ( window.innerHeight <= 600 ) );
   }
+
+// returns width of window
+function windowWidth() {
+    return window.innerWidth;
+}
+
+// returns height of window
+function windowHeight() {
+    return window.innerHeight;
+}
 
 function callback(err){
     console.log(err);
